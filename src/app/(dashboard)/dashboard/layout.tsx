@@ -1,6 +1,8 @@
 import FriendRequestSidebarOptions from "@/components/FriendRequestSidebarOptions";
 import { Icon, Icons } from "@/components/Icons";
+import SidebarChatList from "@/components/SidebarChatList";
 import SignOutButton from "@/components/SignOutButton";
+import { getFriendsByUserId } from "@/helpers/getFriendsByUserId";
 import { fetchRedis } from "@/helpers/redis";
 import { authOptions } from "@/lib/auth";
 import { User } from "@/types/db";
@@ -34,6 +36,8 @@ const Layout = async ({ children }: LayoutProps) => {
     const session = await getServerSession(authOptions);
     if (!session) notFound();
 
+    const friends = await getFriendsByUserId(session.user.id);
+
     const unseenRequestCount = (
         (await fetchRedis(
             "smembers",
@@ -50,13 +54,20 @@ const Layout = async ({ children }: LayoutProps) => {
                 >
                     <Icons.Logo className="h-8 w-auto text-indigo-600" />
                 </Link>
-                <div className="text-xs font-semibold leading-6 text-gray-400">
-                    Your chats
-                </div>
+                {friends && (
+                    <div className="text-xs font-semibold leading-6 text-gray-400">
+                        Your chats
+                    </div>
+                )}
 
                 <nav className="flex flex-1 flex-col">
                     <ul role="list" className="flex flex-1 flex-col gap-y-7">
-                        <li>chats that this user has</li>
+                        <li>
+                            <SidebarChatList
+                                friends={friends}
+                                sessionId={session.user.id}
+                            />
+                        </li>
                         <li>
                             <div className="text-xs font-semibold leading-6 text-gray-400">
                                 Overview
@@ -81,14 +92,16 @@ const Layout = async ({ children }: LayoutProps) => {
                                         </li>
                                     );
                                 })}
-                            </ul>
-                        </li>
 
-                        <li>
-                            <FriendRequestSidebarOptions
-                                sessionId={session.user.id}
-                                initialUnseenRequestCount={unseenRequestCount}
-                            />
+                                <li>
+                                    <FriendRequestSidebarOptions
+                                        sessionId={session.user.id}
+                                        initialUnseenRequestCount={
+                                            unseenRequestCount
+                                        }
+                                    />
+                                </li>
+                            </ul>
                         </li>
 
                         <li className="-mx-6 mt-auto flex items-center">

@@ -5,7 +5,6 @@ import { Message, messageValidator } from "@/lib/validations/message";
 import { User } from "@/types/db";
 import { nanoid } from "nanoid";
 import { getServerSession } from "next-auth";
-import { z } from "zod";
 
 export async function POST(req: Request) {
     try {

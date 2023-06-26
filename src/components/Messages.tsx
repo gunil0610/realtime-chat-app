@@ -45,8 +45,6 @@ const Messages: FC<MessagesProps> = ({
                     message.timestamp
                 );
 
-                console.log({ hasDateChanged }, message.text);
-
                 return (
                     <Fragment key={`${message.id}-${message.timestamp}`}>
                         <div className="chat-message">
